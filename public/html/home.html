@@ -15,6 +15,7 @@
   <script src="/vendor/angular/angular.min.js"></script>
   <script src="/vendor/angular-route/angular-route.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
+  <script src="/vendor/webrtc-adapter/adapter.js"></script>
   <!-- LOAD OWN FILES -->
   <script src="Angular/AngularComponents/Controllers.js"></script>
   <script src="Angular/app.js"></script>
@@ -25,15 +26,22 @@
   </script>
   <title>{{title}}</title>
   <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
-    </style>
+    video {
+           background: black;
+           border: 1px solid gray;
+          } 
+         #yours {
+           width: 150px;
+           height: 150px;
+           /*position: absolute;
+           top: 15px;
+           right: 15px;*/
+          }
+         #theirs {
+           width: 500px;
+           height: 500px;
+          }
+  </style>
 </head>
 
 <body>
@@ -53,87 +61,6 @@
   <div ng-view>
   </div>
   
-  <!-- Very temporary -->
-  <div class="row">
-    <div class="small-12 columns">
-      <p><i>Hit the "go private" button to start peer communication with other WebRTC peers. Mjaaaer! </i></p>
-  
-      <ul id="messages"></ul>
-      <form action="#" id="msg-form">
-        <label>Enter message</label>
-        <input type="text" name="lname" id="msg-box" >
-        <input type="submit" value="Submit">
-      </form>
-      <br />
-      <button id="private" >Go private</button>
-      <span style="color: red;" id="upgrade-msg"></span>
-      <h2>Messages</h2>
-      <ul id="msg-list"></ul>
-    </div>
-  </div>
-
-  <script>
-  
-    function init(){
-        var socket = io();
-        var opts = {peerOpts: {trickle: false}, autoUpgrade: false};
-        var p2p = new P2P(socket, opts, function () {
-        p2p.emit('peer-obj', 'Hello there. I am ' + p2p.peerId);
-        });
-        
-        // Elements
-        var privateButton = document.getElementById('private');
-        var form = document.getElementById('msg-form');
-        var box = document.getElementById('msg-box');
-        var msgList = document.getElementById('msg-list');
-        var upgradeMsg = document.getElementById('upgrade-msg');
-      
-        p2p.on('peer-msg', function(data) {
-          var li = document.createElement("li");
-          li.appendChild(document.createTextNode(data));
-          msgList.appendChild(li);
-        });
-      
-        form.addEventListener('submit', function(e, d) {
-          e.preventDefault();
-          var li = document.createElement("li");
-          li.appendChild(document.createTextNode(box.value));
-          msgList.appendChild(li);
-          p2p.emit('peer-msg', box.value)
-          box.value = '';
-        });
-      
-        privateButton.addEventListener('click', function(e) {
-          alert("You're trying to go private?");
-          goPrivate();
-          p2p.emit('go-private', true)
-        })
-      
-        p2p.on('go-private', function () {
-          goPrivate();
-        });
-      
-        function goPrivate () {
-          p2p.useSockets = false;
-          upgradeMsg.innerHTML = "WebRTC connection established!";
-        }
-         
-    }
-    
-    document.addEventListener('DOMContentLoaded', init, false)
-    
-    // p2p.on('ready', function(){
-    //   p2p.usePeerConnection = true;
-    //   p2p.emit('peer-obj', { peerId: peerId });
-    // });
-
-    //   $('form').submit(function(){
-    //   alert("Data: " + $('#m').val());
-    //   socket.emit('chat message', $('#m').val());
-    //   $('#m').val('');
-    //   return false;
-    // });
-  </script>
 </body>
 
 </html>
